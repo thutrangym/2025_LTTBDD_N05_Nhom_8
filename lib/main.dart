@@ -12,6 +12,7 @@ void main() async {
       supportedLocales: const [Locale('en', 'US'), Locale('vi', 'VN')],
 
       path: 'assets/i18n',
+
       fallbackLocale: const Locale('en', 'US'),
 
       child: const App(),
