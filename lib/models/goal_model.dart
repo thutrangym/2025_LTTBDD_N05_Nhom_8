@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+part 'goal_model.g.dart';
 
 @HiveType(typeId: 1)
 class DailyTaskModel extends HiveObject {

@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+part 'routine_model.g.dart';
 
 @HiveType(typeId: 3)
 class RoutineModel extends HiveObject {
