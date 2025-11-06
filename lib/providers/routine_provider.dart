@@ -16,17 +16,19 @@ class RoutineProvider extends ChangeNotifier {
   List<RoutineModel> get routines => _routines;
   bool get isLoading => _isLoading;
 
-  /// Lấy các routine buổi sáng
   List<RoutineModel> getMorningRoutines() {
     return _routines.where((r) => r.type == 'morning').toList();
   }
 
-  /// Lấy các routine buổi tối
   List<RoutineModel> getEveningRoutines() {
     return _routines.where((r) => r.type == 'evening').toList();
   }
 
-  /// Tải tất cả routine từ local storage
+  List<RoutineModel> getRoutinesForToday() {
+    final today = app_date_utils.DateUtils.formatDate(DateTime.now());
+    return _routines.where((r) => r.completedTasks.containsKey(today)).toList();
+  }
+
   Future<void> loadRoutines() async {
     _isLoading = true;
     notifyListeners();
@@ -34,44 +36,40 @@ class RoutineProvider extends ChangeNotifier {
     try {
       _routines = _repository.getAllRoutines();
     } catch (e) {
-      debugPrint('⚠️ loadRoutines error: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      debugPrint('[RoutineProvider] loadRoutines() error: $e');
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  /// Thêm routine mới
   Future<void> addRoutine(RoutineModel routine) async {
     try {
       await _repository.saveRoutine(routine);
       await loadRoutines();
     } catch (e) {
-      throw Exception('❌ Failed to add routine: $e');
+      throw Exception('Failed to add routine: $e');
     }
   }
 
-  /// Cập nhật routine hiện có
   Future<void> updateRoutine(RoutineModel routine) async {
     try {
       await _repository.saveRoutine(routine);
       await loadRoutines();
     } catch (e) {
-      throw Exception('❌ Failed to update routine: $e');
+      throw Exception('Failed to update routine: $e');
     }
   }
 
-  /// Xoá routine theo id
   Future<void> deleteRoutine(String id) async {
     try {
       await _repository.deleteRoutine(id);
       await loadRoutines();
     } catch (e) {
-      throw Exception('❌ Failed to delete routine: $e');
+      throw Exception('Failed to delete routine: $e');
     }
   }
 
-  /// Đánh dấu routine hôm nay đã hoàn thành / chưa hoàn thành
   Future<void> toggleRoutineTask(String routineId, bool completed) async {
     try {
       final routine = _routines.firstWhere((r) => r.id == routineId);
@@ -88,11 +86,10 @@ class RoutineProvider extends ChangeNotifier {
 
       await updateRoutine(updatedRoutine);
     } catch (e) {
-      throw Exception('❌ Failed to toggle routine task: $e');
+      throw Exception('Failed to toggle routine task: $e');
     }
   }
 
-  /// Kiểm tra routine hôm nay đã hoàn thành chưa
   bool isRoutineCompletedToday(String routineId) {
     try {
       final today = app_date_utils.DateUtils.formatDate(DateTime.now());

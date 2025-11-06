@@ -5,6 +5,7 @@ import '../data/repositories/goal_repository.dart';
 class GoalProvider extends ChangeNotifier {
   final GoalRepository _repository;
   final String? userId;
+
   List<GoalModel> _goals = [];
   bool _isLoading = false;
 
@@ -35,7 +36,7 @@ class GoalProvider extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      debugPrint('LoadGoals error: $e');
+      debugPrint('[GoalProvider] loadGoals() error: $e');
     }
   }
 
@@ -73,16 +74,17 @@ class GoalProvider extends ChangeNotifier {
   ) async {
     try {
       final goal = _goals.firstWhere((g) => g.id == goalId);
-      final tasks = goal.dailyTasks.map((task) {
+      final updatedTasks = goal.dailyTasks.map((task) {
         if (task.date == date) {
           return task.copyWith(isCompleted: isCompleted);
         }
         return task;
       }).toList();
 
-      final completedCount = tasks.where((t) => t.isCompleted).length;
+      final completedCount = updatedTasks.where((t) => t.isCompleted).length;
+
       final updatedGoal = goal.copyWith(
-        dailyTasks: tasks,
+        dailyTasks: updatedTasks,
         progressDays: completedCount,
       );
 
@@ -93,7 +95,13 @@ class GoalProvider extends ChangeNotifier {
   }
 
   List<DailyTaskModel> getTodayTasks(String goalId) {
-    final goal = _goals.firstWhere((g) => g.id == goalId);
-    return goal.dailyTasks.toList();
+    try {
+      final goal = _goals.firstWhere((g) => g.id == goalId);
+      final today = DateTime.now().toIso8601String().substring(0, 10);
+      return goal.dailyTasks.where((t) => t.date == today).toList();
+    } catch (e) {
+      debugPrint('[GoalProvider] getTodayTasks() error: $e');
+      return [];
+    }
   }
 }

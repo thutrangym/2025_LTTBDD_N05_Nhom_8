@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import '../models/todo_model.dart';
 import '../data/repositories/todo_repository.dart';
+import '../core/utils/date_utils.dart' as app_date_utils;
 
 class TodoProvider extends ChangeNotifier {
   final TodoRepository _repository;
+
   List<TodoModel> _todos = [];
   bool _isLoading = false;
 
   TodoProvider({required TodoRepository repository})
     : _repository = repository {
-    _loadTodos();
+    loadTodos();
   }
 
   List<TodoModel> get todos => _todos;
   bool get isLoading => _isLoading;
 
-  void _loadTodos() {
-    loadTodos();
+  List<TodoModel> getTodayTodos() {
+    final today = DateTime.now();
+    return _todos.where((todo) {
+      return app_date_utils.DateUtils.isSameDay(todo.scheduledTime, today);
+    }).toList();
   }
 
   Future<void> loadTodos() async {
@@ -26,7 +31,7 @@ class TodoProvider extends ChangeNotifier {
     try {
       _todos = _repository.getAllTodos();
     } catch (e) {
-      debugPrint('Error loading todos: $e');
+      debugPrint('[TodoProvider] loadTodos() error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -36,9 +41,9 @@ class TodoProvider extends ChangeNotifier {
   Future<void> addTodo(TodoModel todo) async {
     try {
       await _repository.saveTodo(todo);
-
       await loadTodos();
     } catch (e) {
+      debugPrint('[TodoProvider] addTodo() error: $e');
       throw Exception('Failed to add todo: $e');
     }
   }
@@ -46,9 +51,9 @@ class TodoProvider extends ChangeNotifier {
   Future<void> updateTodo(TodoModel todo) async {
     try {
       await _repository.saveTodo(todo);
-
       await loadTodos();
     } catch (e) {
+      debugPrint('[TodoProvider] updateTodo() error: $e');
       throw Exception('Failed to update todo: $e');
     }
   }
@@ -58,6 +63,7 @@ class TodoProvider extends ChangeNotifier {
       await _repository.deleteTodo(id);
       await loadTodos();
     } catch (e) {
+      debugPrint('[TodoProvider] deleteTodo() error: $e');
       throw Exception('Failed to delete todo: $e');
     }
   }
@@ -71,7 +77,14 @@ class TodoProvider extends ChangeNotifier {
       );
       await updateTodo(updatedTodo);
     } catch (e) {
+      debugPrint('[TodoProvider] toggleTodoComplete() error: $e');
       throw Exception('Failed to toggle todo: $e');
     }
+  }
+
+  List<TodoModel> getTodosByDate(DateTime date) {
+    return _todos.where((todo) {
+      return app_date_utils.DateUtils.isSameDay(todo.scheduledTime, date);
+    }).toList();
   }
 }
