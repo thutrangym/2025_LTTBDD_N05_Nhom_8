@@ -10,6 +10,13 @@
   "register": "Đăng Ký",
   "email": "Email",
   "password": "Mật khẩu",
+  "confirm_password": "Xác nhận mật khẩu",
+  "full_name": "Họ và tên",
+  "field_required": "Vui lòng không để trống",
+  "invalid_email": "Email không hợp lệ",
+  "password_too_short": "Mật khẩu phải có ít nhất 6 ký tự",
+  "passwords_do_not_match": "Mật khẩu không khớp",
+  "already_registered": "Đã có tài khoản?",
   "loginRequired": "Yêu Cầu Đăng Nhập",
   "loginMessage": "Vui lòng đăng nhập để sử dụng ứng dụng.",
   "greeting": "Xin chào, {name}",
@@ -21,6 +28,7 @@
   "add_calendar": "Thêm sự kiện",
   "edit": "Chỉnh sửa",
   "save": "Lưu",
+  "settings_saved": "Đã lưu cài đặt",
   "cancel": "Hủy",
   "delete": "Xóa",
   "done": "Hoàn thành",
@@ -72,5 +80,10 @@
   "error": "Lỗi",
   "success": "Thành công",
   "days": "ngày",
-  "login_success": "Đăng nhập thành công"
+  "login_success": "Đăng nhập thành công",
+  "auth_email_exists": "Email này đã được sử dụng",
+  "auth_invalid_credentials": "Email hoặc mật khẩu không đúng",
+  "auth_unexpected_error": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "logout": "Đăng xuất",
+  "logout_success": "Đăng xuất thành công"
 }

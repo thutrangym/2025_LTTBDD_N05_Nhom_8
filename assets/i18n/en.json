@@ -10,6 +10,13 @@
   "register": "Register",
   "email": "Email",
   "password": "Password",
+  "confirm_password": "Confirm Password",
+  "full_name": "Full Name",
+  "field_required": "This field is required",
+  "invalid_email": "Please enter a valid email",
+  "password_too_short": "Password must be at least 6 characters",
+  "passwords_do_not_match": "Passwords do not match",
+  "already_registered": "Already have an account?",
   "loginRequired": "Login Required",
   "loginMessage": "Please log in to use the application.",
   "registerPrompt": "Don't have an account?",
@@ -22,6 +29,7 @@
   "add_calendar": "Add Event",
   "edit": "Edit",
   "save": "Save",
+  "settings_saved": "Settings saved",
   "cancel": "Cancel",
   "delete": "Delete",
   "done": "Done",
@@ -73,5 +81,10 @@
   "error": "Error",
   "success": "Success",
   "days": "days",
-  "login_success": "Login successful"
+  "login_success": "Login successful",
+  "auth_email_exists": "An account with this email already exists",
+  "auth_invalid_credentials": "Invalid email or password",
+  "auth_unexpected_error": "Something went wrong. Please try again.",
+  "logout": "Logout",
+  "logout_success": "Signed out successfully"
 }

@@ -4,6 +4,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'data/local/hive_manager.dart';
 import 'services/notification_service.dart';
 import 'services/pomodoro_service.dart';
+import 'services/auth_service.dart';
+import 'services/database_service.dart';
+import 'screens/app_wrapper.dart';
 import 'data/local/local_storage_service.dart';
 import 'data/repositories/todo_repository.dart';
 import 'data/repositories/goal_repository.dart';
@@ -14,7 +17,6 @@ import 'providers/goal_provider.dart';
 import 'providers/routine_provider.dart';
 import 'providers/pomodoro_provider.dart';
 import 'providers/stats_provider.dart';
-import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +26,11 @@ void main() async {
   // Initialize Hive
   await HiveManager.init();
 
+  final savedLanguageCode = HiveManager.settingsBox.get('language') as String?;
+  final startLocale = savedLanguageCode == 'vi'
+      ? const Locale('vi')
+      : const Locale('en');
+
   // Initialize Notifications
   await NotificationService.initialize();
 
@@ -32,13 +39,19 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('vi')],
       path: 'assets/i18n',
       fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+      startLocale: startLocale,
+      child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key})
+    : _authService = AuthService(),
+      _databaseService = DatabaseService();
+
+  final AuthService _authService;
+  final DatabaseService _databaseService;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +98,10 @@ class MyApp extends StatelessWidget {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            home: const App(userId: 'demo-user'),
+            home: AppWrapper(
+              authService: _authService,
+              databaseService: _databaseService,
+            ),
           );
         },
       ),

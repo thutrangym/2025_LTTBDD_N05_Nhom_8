@@ -32,6 +32,7 @@ class HiveManager {
       await Hive.openBox<GoalModel>('goals');
       await Hive.openBox<RoutineModel>('routines');
       await Hive.openBox<MoodModel>('moods');
+      await Hive.openBox('users');
       await Hive.openBox('settings');
     } catch (e) {
       debugPrint('Error opening Hive boxes: $e');
@@ -46,5 +47,6 @@ class HiveManager {
   static Box<RoutineModel> get routinesBox =>
       Hive.box<RoutineModel>('routines');
   static Box<MoodModel> get moodsBox => Hive.box<MoodModel>('moods');
+  static Box get usersBox => Hive.box('users');
   static Box get settingsBox => Hive.box('settings');
 }

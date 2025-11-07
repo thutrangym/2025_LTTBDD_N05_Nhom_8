@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_first_flutter_app/core/localization.dart';
-import 'package:my_first_flutter_app/models/goal.dart';
-import 'package:my_first_flutter_app/models/routine.dart';
-import 'package:my_first_flutter_app/models/todo.dart';
-import 'package:my_first_flutter_app/screens/settings/setting_screen.dart';
-import 'package:my_first_flutter_app/services/database_service.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:my_first_flutter_app/screens/settings/setting_screen.dart';
 import '../../providers/todo_provider.dart';
 
 import '../../models/user_model.dart';
@@ -19,8 +14,9 @@ import 'goal_list_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   final UserModel user;
+  final Future<void> Function()? onSignOut;
 
-  const HomeScreen({super.key, required this.user});
+  const HomeScreen({super.key, required this.user, this.onSignOut});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +29,9 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(onSignOut: onSignOut),
+                ),
               );
             },
           ),
