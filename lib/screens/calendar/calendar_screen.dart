@@ -40,29 +40,53 @@ class _CalendarScreenState extends State<CalendarScreen> {
           const SizedBox(height: 8),
           CustomCard(
             margin: const EdgeInsets.all(16),
-            child: TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              calendarFormat: _calendarFormat,
-              onFormatChanged: (format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              },
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
-              },
-              eventLoader: (day) {
-                return context.read<EventProvider>().getEventsForDay(day);
-              },
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Buttons to switch between calendar formats
+                    _buildCalendarFormatButton(
+                      context,
+                      label: '2 weeks',
+                      format: CalendarFormat.twoWeeks,
+                    ),
+                    _buildCalendarFormatButton(
+                      context,
+                      label: 'Month',
+                      format: CalendarFormat.month,
+                    ),
+                    _buildCalendarFormatButton(
+                      context,
+                      label: 'Week',
+                      format: CalendarFormat.week,
+                    ),
+                  ],
+                ),
+                TableCalendar(
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
+                  focusedDay: _focusedDay,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  calendarFormat: _calendarFormat,
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                  ),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  onPageChanged: (focusedDay) {
+                    _focusedDay = focusedDay;
+                  },
+                  eventLoader: (day) {
+                    return context.read<EventProvider>().getEventsForDay(day);
+                  },
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -101,6 +125,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
         onPressed: () => _showAddEventDialog(context),
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Widget _buildCalendarFormatButton(
+    BuildContext context, {
+    required String label,
+    required CalendarFormat format,
+  }) {
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          _calendarFormat = format;
+        });
+      },
+      child: Text(label),
     );
   }
 
