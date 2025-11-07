@@ -86,8 +86,6 @@ class NotificationUtils {
       tz.TZDateTime.from(dateToSchedule, tz.local),
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
