@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:intl/intl.dart';
 import 'package:my_first_flutter_app/screens/settings/setting_screen.dart';
 import '../../providers/todo_provider.dart';
+import '../../providers/goal_provider.dart';
 
 import '../../models/user_model.dart';
 import '../../models/todo_model.dart';
@@ -11,6 +13,7 @@ import '../../core/widgets/custom_card.dart';
 
 import 'todo_list_widget.dart';
 import 'goal_list_widget.dart';
+import 'goals_detail_page.dart';
 
 class HomeScreen extends StatelessWidget {
   final UserModel user;
@@ -52,7 +55,11 @@ class HomeScreen extends StatelessWidget {
               SectionHeader(title: "today_todos".tr()),
               const TodoListWidget(),
               const SizedBox(height: 16),
-              SectionHeader(title: "goals".tr()),
+              SectionHeader(
+                title: "goals".tr(),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _openGoalSection(context),
+              ),
               const GoalListWidget(),
             ],
           ),
@@ -102,6 +109,18 @@ class HomeScreen extends StatelessWidget {
   void _showAddTodoDialog(BuildContext context) {
     showDialog(context: context, builder: (context) => const AddTodoDialog());
   }
+
+  void _openGoalSection(BuildContext context) {
+    final goalProvider = context.read<GoalProvider>();
+    if (goalProvider.isLoading) {
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const GoalsDetailPage()),
+    );
+  }
 }
 
 class AddTodoDialog extends StatefulWidget {
@@ -144,6 +163,35 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
                 controller: _descriptionController,
                 decoration: InputDecoration(labelText: 'detailed_content'.tr()),
                 maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                title: Text('date'.tr()),
+                subtitle: Text(
+                  DateFormat.yMMMMd(
+                    context.locale.toLanguageTag(),
+                  ).format(_selectedTime),
+                ),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedTime,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _selectedTime = DateTime(
+                        pickedDate.year,
+                        pickedDate.month,
+                        pickedDate.day,
+                        _selectedTime.hour,
+                        _selectedTime.minute,
+                      );
+                    });
+                  }
+                },
               ),
               const SizedBox(height: 16),
               ListTile(

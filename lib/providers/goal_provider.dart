@@ -67,6 +67,25 @@ class GoalProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> addDailyTask(String goalId, DailyTaskModel task) async {
+    try {
+      final goal = _goals.firstWhere((g) => g.id == goalId);
+      final updatedTasks = [...goal.dailyTasks, task];
+      final completedCount =
+          updatedTasks.where((element) => element.isCompleted).length;
+
+      final updatedGoal = goal.copyWith(
+        dailyTasks: updatedTasks,
+        totalDays: updatedTasks.length,
+        progressDays: completedCount,
+      );
+
+      await updateGoal(updatedGoal);
+    } catch (e) {
+      throw Exception('Failed to add daily task: $e');
+    }
+  }
+
   Future<void> updateDailyTask(
     String goalId,
     String date,
@@ -81,11 +100,10 @@ class GoalProvider extends ChangeNotifier {
         return task;
       }).toList();
 
-      final completedCount = updatedTasks.where((t) => t.isCompleted).length;
-
       final updatedGoal = goal.copyWith(
         dailyTasks: updatedTasks,
-        progressDays: completedCount,
+        totalDays: updatedTasks.length,
+        progressDays: updatedTasks.where((t) => t.isCompleted).length,
       );
 
       await updateGoal(updatedGoal);

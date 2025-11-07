@@ -4,17 +4,19 @@ class SectionHeader extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final VoidCallback? onSeeAll;
+  final VoidCallback? onTap;
 
   const SectionHeader({
     super.key,
     required this.title,
     this.trailing,
     this.onSeeAll,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final header = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -32,5 +34,15 @@ class SectionHeader extends StatelessWidget {
         ],
       ),
     );
+
+    if (onTap != null) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: header,
+      );
+    }
+
+    return header;
   }
 }

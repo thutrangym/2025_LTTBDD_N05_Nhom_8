@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+
 import '../../providers/todo_provider.dart';
 import '../../models/todo_model.dart';
 import '../../core/widgets/custom_card.dart';

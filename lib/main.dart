@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_first_flutter_app/providers/event_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'data/local/hive_manager.dart';
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => RoutineProvider(repository: routineRepository),
         ),
+        ChangeNotifierProvider(create: (_) => EventProvider()),
       ],
       child: Consumer<AppState>(
         builder: (context, appState, _) {
