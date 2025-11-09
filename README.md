@@ -1,92 +1,120 @@
-# my_first_flutter_app
+# 📱 ỨNG DỤNG QUẢN LÝ NĂNG SUẤT CÁ NHÂN
 
-A new Flutter project.
+> Ứng dụng giúp người dùng quản lý công việc, mục tiêu, thói quen và thời gian hiệu quả – được xây dựng bằng **Flutter**, hoạt động nhanh và mượt nhờ kiến trúc **Offline-first**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 TỔNG QUAN DỰ ÁN
 
-A few resources to get you started if this is your first Flutter project:
+Ứng dụng hỗ trợ người dùng:
+- **Lên kế hoạch công việc hàng ngày (To-Do)**
+- **Theo dõi mục tiêu (Goal Tracking)**
+- **Tạo thói quen buổi sáng & tối (Routine)**
+- **Lập lịch và sự kiện cá nhân (Calendar)**
+- **Tối ưu hoá thời gian làm việc (Pomodoro Timer)**
+- **Thống kê hiệu suất làm việc (Statistics)**
+- **Tuỳ chỉnh giao diện & ngôn ngữ (Localization)**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Toàn bộ dữ liệu được lưu **cục bộ** bằng Hive, đảm bảo không mất dữ liệu khi không có mạng.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
 
-lib/
-┣ core/
-┃ ┣ constants/
-┃ ┃ ┣ app_colors.dart // Màu sắc chuẩn của app
-┃ ┃ ┣ app_strings.dart // Các chuỗi hằng số
-┃ ┃ ┗ app_text_styles.dart // Các kiểu chữ chuẩn
-┃ ┣ utils/
-┃ ┃ ┣ chart_utils.dart // Hàm tiện ích cho chart
-┃ ┃ ┣ date_utils.dart // Hàm tiện ích xử lý ngày tháng
-┃ ┃ ┗ notification_utils.dart // Hàm tiện ích thông báo
-┃ ┣ widgets/
-┃ ┃ ┣ bottom_nav_bar.dart // Widget bottom navigation
-┃ ┃ ┣ custom_button.dart // Widget button tuỳ chỉnh
-┃ ┃ ┣ custom_card.dart // Widget Card tuỳ chỉnh
-┃ ┃ ┗ section_header.dart // Header cho các section UI
-┃ ┣ localization.dart // Cấu hình đa ngôn ngữ
-┃ ┗ utilities.dart // Các hàm tiện ích chung
-┣ data/
-┃ ┣ local/
-┃ ┃ ┣ hive_manager.dart // Quản lý database Hive
-┃ ┃ ┗ local_storage_service.dart // Lưu/đọc dữ liệu local
-┃ ┗ repositories/
-┃ ┣ goal_repository.dart // Lưu trữ & truy xuất Goal
-┃ ┣ routine_repository.dart // Lưu trữ & truy xuất Routine
-┃ ┗ todo_repository.dart // Lưu trữ & truy xuất Todo
-┣ localization/
-┃ ┗ app_localization.dart // Quản lý chuỗi đa ngôn ngữ
-┣ models/
-┃ ┣ event_model.dart // Model Event
-┃ ┣ goal.dart // Model Goal cơ bản
-┃ ┣ goal_model.dart // Model Goal cho Hive/JSON
-┃ ┣ goal_model.g.dart // File tự sinh Goal
-┃ ┣ routine.dart // Model Routine cơ bản
-┃ ┣ routine_model.dart // Model Routine cho Hive/JSON
-┃ ┣ routine_model.g.dart // File tự sinh Routine
-┃ ┣ stats_model.dart // Model thống kê
-┃ ┣ todo.dart // Model Todo cơ bản
-┃ ┣ todo_model.dart // Model Todo cho Hive/JSON
-┃ ┣ todo_model.g.dart // File tự sinh Todo
-┃ ┣ user.dart // Model User cơ bản
-┃ ┗ user_model.dart // Model User cho Hive/JSON
-┣ providers/
-┃ ┣ app_state.dart // State tổng quát app
-┃ ┣ event_provider.dart // State & logic Event
-┃ ┣ goal_provider.dart // State & logic Goal
-┃ ┣ pomodoro_provider.dart // State & logic Pomodoro
-┃ ┣ routine_provider.dart // State & logic Routine
-┃ ┣ stats_provider.dart // State & logic thống kê
-┃ ┗ todo_provider.dart // State & logic Todo
-┣ screens/
-┃ ┣ calendar/
-┃ ┃ ┗ calendar_screen.dart // Màn hình lịch
-┃ ┣ home/
-┃ ┃ ┣ goals_detail_page.dart // Chi tiết Goal
-┃ ┃ ┣ goal_detail_screen.dart // Chi tiết Goal
-┃ ┃ ┣ goal_dialogs.dart // Dialog thêm/sửa Goal
-┃ ┃ ┣ goal_list_widget.dart // Widget danh sách Goal
-┃ ┃ ┣ home_screen.dart // Màn hình Home
-┃ ┃ ┗ todo_list_widget.dart // Widget danh sách Todo
-┃ ┣ pomodoro/
-┃ ┃ ┗ pomodoro_screen.dart // Màn hình Pomodoro
-┃ ┣ routine/
-┃ ┃ ┗ routine_screen.dart // Màn hình Routine
-┃ ┣ settings/
-┃ ┃ ┗ setting_screen.dart // Màn hình Settings
-┃ ┣ stats/
-┃ ┃ ┗ stats_screen.dart // Màn hình thống kê
-┃ ┗ app_wrapper.dart // Widget bao quanh app
-┣ services/
-┃ ┣ auth_service.dart // Xử lý đăng nhập/đăng ký
-┃ ┣ database_service.dart // Service database
-┃ ┣ notification_service.dart // Service thông báo
-┃ ┗ pomodoro_service.dart // Service Pomodoro logic
-┣ app.dart // Khởi tạo MaterialApp
-┗ main.dart // Entry point của app
+## 🏗️ CÔNG NGHỆ & KIẾN TRÚC
+
+| Thành phần | Công nghệ / Mô tả |
+|-------------|--------------------|
+| **Framework** | Flutter |
+| **Ngôn ngữ** | Dart |
+| **Cơ sở dữ liệu** | Hive (Local NoSQL) |
+| **State Management** | Provider |
+| **Đa ngôn ngữ** | easy_localization |
+| **Biểu đồ thống kê** | fl_chart |
+| **Offline-first** | Tất cả dữ liệu lưu cục bộ, đồng bộ nền khi có mạng |
+| **Pomodoro Service** | Bất đồng bộ (asynchronous) để không chặn UI |
+
+---
+
+## ⚙️ CÀI ĐẶT & CHẠY DỰ ÁN
+
+### 1 Cài đặt môi trường
+- [Flutter SDK](https://flutter.dev/docs/get-started/install)
+- Android Studio hoặc VS Code
+- Thiết bị ảo (emulator) hoặc điện thoại thật
+
+### 2 Clone dự án
+```bash
+git clone https://github.com/thutrangym/2025_LTTBDD_N05_Nhom_8.git
+cd personal_productivity_app
+```
+
+### 3 Cài đặt thư viện
+
+```
+flutter pub get
+```
+### 4 Chạy ứng dụng
+```
+flutter run
+```
+### CẤU TRÚC THƯ MỤC CHÍNH
+
+### TÍNH NĂNG CHÍNH
+✅ **To-Do**
+
+Thêm, sửa, xoá công việc.
+
+Phân loại và đặt thời hạn.
+
+Lưu trữ offline bằng Hive.
+
+🎯 **Goal Tracking**
+
+Tạo mục tiêu lớn và chia nhỏ thành công việc con.
+
+Thanh tiến trình cập nhật tự động khi hoàn thành task.
+
+🔁 **Routine**
+
+Quản lý thói quen buổi sáng & tối.
+
+(Hiện đang cập nhật để cải thiện tính đồng bộ.)
+
+📅 **Calendar**
+
+Xem lịch theo tuần, 2 tuần, tháng.
+
+Thêm / xoá sự kiện nhanh chóng.
+
+⏱ **Pomodoro Timer**
+
+Chọn công việc, đặt thời gian, bắt đầu.
+
+Dịch vụ chạy nền giúp ứng dụng không bị đơ.
+
+Kết quả được ghi nhận cho phần thống kê.
+
+📊 **Statistics**
+
+Tổng hợp dữ liệu từ Todo, Goal, Pomodoro.
+
+Biểu đồ thể hiện tiến độ theo ngày & tháng.
+
+Sử dụng cache để tải nhanh.
+
+🎨 **Cá nhân hóa**
+
+Đổi theme (sáng/tối).
+
+Đổi ngôn ngữ ngay lập tức bằng Easy Localization.
+
+🔧 **ROADMAP**
+
+ Sửa lỗi Routine đồng bộ trạng thái.
+
+ Thêm tính năng đồng bộ cloud (Firebase).
+
+ Tích hợp đăng nhập người dùng.
+
+ Biểu đồ hiệu suất nâng cao.
+
+ Widget màn hình chính (home widget).
