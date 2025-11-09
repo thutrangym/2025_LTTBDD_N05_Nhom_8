@@ -5,24 +5,20 @@ import '../core/utils/date_utils.dart' as app_date_utils;
 
 class RoutineProvider extends ChangeNotifier {
   final RoutineRepository _repository;
-  List<RoutineModel> _routines = [];
+  final List<RoutineModel> _routines = [];
   bool _isLoading = false;
 
   RoutineProvider({required RoutineRepository repository})
-    : _repository = repository {
-    loadRoutines();
-  }
+    : _repository = repository;
 
   List<RoutineModel> get routines => _routines;
   bool get isLoading => _isLoading;
 
-  List<RoutineModel> getMorningRoutines() {
-    return _routines.where((r) => r.type == 'morning').toList();
-  }
+  List<RoutineModel> getMorningRoutines() =>
+      _routines.where((r) => r.type == 'morning').toList();
 
-  List<RoutineModel> getEveningRoutines() {
-    return _routines.where((r) => r.type == 'evening').toList();
-  }
+  List<RoutineModel> getEveningRoutines() =>
+      _routines.where((r) => r.type == 'evening').toList();
 
   List<RoutineModel> getRoutinesForToday() {
     final today = app_date_utils.DateUtils.formatDate(DateTime.now());
@@ -34,9 +30,12 @@ class RoutineProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _routines = _repository.getAllRoutines();
+      final data = await _repository.getAllRoutines();
+      _routines
+        ..clear()
+        ..addAll(data);
     } catch (e) {
-      debugPrint('[RoutineProvider] loadRoutines() error: $e');
+      debugPrint('Failed to load routines: $e');
     }
 
     _isLoading = false;
@@ -46,27 +45,33 @@ class RoutineProvider extends ChangeNotifier {
   Future<void> addRoutine(RoutineModel routine) async {
     try {
       await _repository.saveRoutine(routine);
-      await loadRoutines();
+      _routines.add(routine);
+      notifyListeners();
     } catch (e) {
-      throw Exception('Failed to add routine: $e');
+      debugPrint('Failed to add routine: $e');
     }
   }
 
   Future<void> updateRoutine(RoutineModel routine) async {
     try {
       await _repository.saveRoutine(routine);
-      await loadRoutines();
+      final index = _routines.indexWhere((r) => r.id == routine.id);
+      if (index != -1) {
+        _routines[index] = routine;
+        notifyListeners();
+      }
     } catch (e) {
-      throw Exception('Failed to update routine: $e');
+      debugPrint('Failed to update routine: $e');
     }
   }
 
   Future<void> deleteRoutine(String id) async {
     try {
       await _repository.deleteRoutine(id);
-      await loadRoutines();
+      _routines.removeWhere((r) => r.id == id);
+      notifyListeners();
     } catch (e) {
-      throw Exception('Failed to delete routine: $e');
+      debugPrint('Failed to delete routine: $e');
     }
   }
 
@@ -85,8 +90,9 @@ class RoutineProvider extends ChangeNotifier {
       );
 
       await updateRoutine(updatedRoutine);
+      notifyListeners(); // Important!
     } catch (e) {
-      throw Exception('Failed to toggle routine task: $e');
+      debugPrint('Failed to toggle routine task: $e');
     }
   }
 
@@ -95,7 +101,7 @@ class RoutineProvider extends ChangeNotifier {
       final today = app_date_utils.DateUtils.formatDate(DateTime.now());
       final routine = _routines.firstWhere((r) => r.id == routineId);
       return routine.completedTasks[today] ?? false;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }

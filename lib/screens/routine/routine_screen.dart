@@ -1,218 +1,234 @@
 import 'package:flutter/material.dart';
+import 'package:my_first_flutter_app/models/routine.dart';
+import 'package:my_first_flutter_app/services/database_service.dart';
 import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../providers/pomodoro_provider.dart';
-import '../../providers/todo_provider.dart';
-import '../../providers/routine_provider.dart';
-import '../../core/widgets/custom_card.dart';
-import '../../core/widgets/custom_button.dart';
 
-class PomodoroScreen extends StatefulWidget {
-  const PomodoroScreen({super.key});
+class RoutineScreen extends StatefulWidget {
+  const RoutineScreen({super.key});
 
   @override
-  State<PomodoroScreen> createState() => _PomodoroScreenState();
+  State<RoutineScreen> createState() => _RoutineScreenState();
 }
 
-class _PomodoroScreenState extends State<PomodoroScreen> {
-  int _selectedMinutes = 25;
+class _RoutineScreenState extends State<RoutineScreen> {
+  late DatabaseService _db;
+  final _nameController = TextEditingController();
+  final _timeController = TextEditingController();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _db = Provider.of<DatabaseService>(context, listen: false);
+    // Force initial load of routines
+    _db.getRoutines().listen((event) {});
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _timeController.dispose();
+    super.dispose();
+  }
+
+  void _showAddRoutineDialog(RoutineType type) {
+    _nameController.clear();
+    _timeController.clear();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Add Routine ${type == RoutineType.morning ? "morning" : "evening"}',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Routine'),
+              ),
+              TextField(
+                controller: _timeController,
+                decoration: const InputDecoration(labelText: 'Time'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = _nameController.text.trim();
+                final time = _timeController.text.trim();
+                if (name.isNotEmpty && time.isNotEmpty) {
+                  await _db.addRoutine(name, time, type);
+                  if (mounted) Navigator.pop(context);
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRoutineList(String title, RoutineType type) {
+    print('Building routine list for $title');
+    return StreamBuilder<List<RoutineTask>>(
+      stream: _db.getRoutinesByType(type),
+      builder: (context, snapshot) {
+        print(
+          'StreamBuilder update for $title - connection state: ${snapshot.connectionState}',
+        );
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          print('Error in StreamBuilder for $title: ${snapshot.error}');
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final routines = snapshot.data ?? [];
+        print('$title routines count: ${routines.length}');
+
+        return Card(
+          margin: const EdgeInsets.all(12),
+          child: ExpansionTile(
+            initiallyExpanded: true,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  color: Colors.indigo,
+                  onPressed: () => _showAddRoutineDialog(type),
+                ),
+              ],
+            ),
+            children: [
+              if (routines.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'No routines added yet.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ...routines.map((routine) {
+                return ListTile(
+                  leading: Checkbox(
+                    value: routine.isCompleted,
+                    onChanged: (val) {
+                      _db.updateRoutineCompletion(routine.id, val ?? false);
+                    },
+                  ),
+                  title: Text(routine.name),
+                  subtitle: Text('Time: ${routine.time}'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () => _db.deleteRoutine(routine.id),
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _addMockData() async {
+    print('Starting to add mock data...');
+    try {
+      // Morning routines
+      final morningRoutines = [
+        {'name': 'Make bed', 'time': '06:00 AM'},
+        {'name': 'Drink water', 'time': '06:15 AM'},
+        {'name': 'Exercise', 'time': '06:30 AM'},
+        {'name': 'Personal hygiene', 'time': '07:00 AM'},
+      ];
+
+      // Evening routines
+      final eveningRoutines = [
+        {'name': 'Skin care', 'time': '08:00 PM'},
+        {'name': 'Read', 'time': '08:30 PM'},
+        {'name': 'Meditate', 'time': '09:00 PM'},
+      ];
+
+      print('Adding ${morningRoutines.length} morning routines...');
+      // Add morning routines
+      for (var routine in morningRoutines) {
+        print('Adding morning routine: ${routine['name']}');
+        await _db.addRoutine(
+          routine['name']!,
+          routine['time']!,
+          RoutineType.morning,
+        );
+      }
+
+      print('Adding ${eveningRoutines.length} evening routines...');
+      // Add evening routines
+      for (var routine in eveningRoutines) {
+        print('Adding evening routine: ${routine['name']}');
+        await _db.addRoutine(
+          routine['name']!,
+          routine['time']!,
+          RoutineType.evening,
+        );
+      }
+
+      // Trigger a reload of routines
+      print('Triggering routine reload...');
+      _db.getRoutines().listen((routines) {
+        print('Reloaded routines, count: ${routines.length}');
+      });
+    } catch (e, stackTrace) {
+      print('Error adding mock data: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('pomodoro'.tr())),
-      body: Consumer<PomodoroProvider>(
-        builder: (context, pomodoroProvider, _) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-                CustomCard(
-                  child: Column(
-                    children: [
-                      Text(
-                        'set_timer'.tr(),
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildTimeButton(15),
-                          const SizedBox(width: 16),
-                          _buildTimeButton(25),
-                          const SizedBox(width: 16),
-                          _buildTimeButton(45),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      Text(
-                        pomodoroProvider.formattedTime,
-                        style: Theme.of(context).textTheme.displayLarge
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (pomodoroProvider.isRunning)
-                            CustomButton(
-                              text: 'pause'.tr(),
-                              onPressed: () => pomodoroProvider.pause(),
-                              width: 120,
-                            )
-                          else
-                            CustomButton(
-                              text: pomodoroProvider.remainingSeconds > 0
-                                  ? 'resume'.tr()
-                                  : 'start'.tr(),
-                              onPressed: () =>
-                                  pomodoroProvider.start(_selectedMinutes),
-                              width: 120,
-                            ),
-                          const SizedBox(width: 16),
-                          CustomButton(
-                            text: 'stop'.tr(),
-                            onPressed: () => pomodoroProvider.stop(),
-                            width: 120,
-                            backgroundColor: Colors.red,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                const _TodoSelectionWidget(),
-                const SizedBox(height: 16),
-                const _RoutineSelectionWidget(),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildTimeButton(int minutes) {
-    final isSelected = _selectedMinutes == minutes;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedMinutes = minutes;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).primaryColor : Colors.grey[200],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          '$minutes min',
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
-            fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: const Text('Routines'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _addMockData,
+            tooltip: 'Add mock data',
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TodoSelectionWidget extends StatelessWidget {
-  const _TodoSelectionWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    final todoProvider = context.watch<TodoProvider>();
-    final pomodoroProvider = context.read<PomodoroProvider>();
-
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'select_todo'.tr(),
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 16),
-          if (todoProvider.getTodayTodos().isEmpty)
-            Text(
-              'no_todos'.tr(),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-            )
-          else
-            ...todoProvider.getTodayTodos().map((todo) {
-              final isSelected = pomodoroProvider.selectedTodoId == todo.id;
-              return ListTile(
-                title: Text(todo.title),
-                trailing: isSelected
-                    ? Icon(
-                        Icons.check_circle,
-                        color: Theme.of(context).primaryColor,
-                      )
-                    : null,
-                onTap: () {
-                  pomodoroProvider.setSelectedTodo(todo.id);
-                },
-              );
-            }),
         ],
       ),
-    );
-  }
-}
-
-class _RoutineSelectionWidget extends StatelessWidget {
-  const _RoutineSelectionWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    final routineProvider = context.watch<RoutineProvider>();
-    final pomodoroProvider = context.read<PomodoroProvider>();
-
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'select_routine'.tr(),
-            style: Theme.of(context).textTheme.titleMedium,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 8),
+              _buildRoutineList('Morning', RoutineType.morning),
+              _buildRoutineList('Evening', RoutineType.evening),
+            ],
           ),
-          const SizedBox(height: 16),
-          if (routineProvider.routines.isEmpty)
-            Text(
-              'no_routines'.tr(),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-            )
-          else
-            ...routineProvider.routines.map((routine) {
-              final isSelected =
-                  pomodoroProvider.selectedRoutineId == routine.id;
-              return ListTile(
-                title: Text(routine.title),
-                trailing: isSelected
-                    ? Icon(
-                        Icons.check_circle,
-                        color: Theme.of(context).primaryColor,
-                      )
-                    : null,
-                onTap: () {
-                  pomodoroProvider.setSelectedRoutine(routine.id);
-                },
-              );
-            }),
-        ],
+        ),
       ),
     );
   }

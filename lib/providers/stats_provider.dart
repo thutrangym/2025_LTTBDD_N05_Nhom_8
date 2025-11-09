@@ -19,8 +19,10 @@ class StatsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addPomodoroSession(DateTime date, int minutes) {
+  Future<void> addPomodoroSession(DateTime date, int minutes) async {
     final dateStr = app_date.DateUtils.formatDate(date);
+    // ignore: avoid_print
+    print('[StatsProvider] add session: $minutes minutes -> $dateStr');
     _pomodoroSessions[dateStr] = (_pomodoroSessions[dateStr] ?? 0) + minutes;
     notifyListeners();
   }
@@ -83,7 +85,7 @@ class StatsProvider extends ChangeNotifier {
   List<StatsModel> getLast7DaysStats() {
     final stats = <StatsModel>[];
     final now = DateTime.now();
-    for (var i = 6; i >= 0; i--) {
+    for (var i = 7; i >= 1; i--) {
       final date = now.subtract(Duration(days: i));
       stats.add(
         StatsModel(
@@ -101,7 +103,7 @@ class StatsProvider extends ChangeNotifier {
   List<StatsModel> getLast30DaysStats() {
     final stats = <StatsModel>[];
     final now = DateTime.now();
-    for (var i = 29; i >= 0; i--) {
+    for (var i = 31; i >= 1; i--) {
       final date = now.subtract(Duration(days: i));
       stats.add(
         StatsModel(

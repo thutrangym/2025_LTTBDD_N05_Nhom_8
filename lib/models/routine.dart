@@ -1,10 +1,10 @@
-// RoutineTask and MoodEntry Models are combined here for simplicity
-
 class MoodEntry {
   final String mood;
   final String icon;
   MoodEntry(this.mood, this.icon);
 }
+
+enum RoutineType { morning, evening }
 
 class RoutineTask {
   final String id;
@@ -30,5 +30,18 @@ class RoutineTask {
       time: time ?? this.time,
       isCompleted: isCompleted ?? this.isCompleted,
     );
+  }
+
+  factory RoutineTask.fromJson(Map<String, dynamic> json) {
+    return RoutineTask(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      time: json['time'] ?? '',
+      isCompleted: json['isCompleted'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'time': time, 'isCompleted': isCompleted};
   }
 }

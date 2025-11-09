@@ -169,10 +169,7 @@ class _AppWrapperState extends State<AppWrapper> {
 
     final pages = <Widget>[
       HomeScreen(user: _currentUser!, onSignOut: _handleSignOut),
-      RoutineTab(
-        databaseService: widget.databaseService,
-        userId: _currentUser!.uid,
-      ),
+      RoutineTab(databaseService: widget.databaseService),
       const CalendarScreen(),
       const PomodoroScreen(),
       const StatsScreen(),
@@ -364,19 +361,14 @@ class _AuthScaffold extends StatelessWidget {
 }
 
 class RoutineTab extends StatelessWidget {
-  const RoutineTab({
-    super.key,
-    required this.databaseService,
-    required this.userId,
-  });
+  const RoutineTab({super.key, required this.databaseService});
 
   final DatabaseService databaseService;
-  final String userId;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<RoutineTask>>(
-      stream: databaseService.getRoutines(userId),
+      stream: databaseService.getRoutines(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

@@ -31,6 +31,9 @@ class TodoModel extends HiveObject {
   @HiveField(8)
   DateTime? completedAt;
 
+  @HiveField(9)
+  String? goalId;
+
   TodoModel({
     required this.id,
     required this.title,
@@ -41,6 +44,7 @@ class TodoModel extends HiveObject {
     this.isCompleted = false,
     required this.createdAt,
     this.completedAt,
+    this.goalId,
   });
 
   TodoModel copyWith({
@@ -53,6 +57,7 @@ class TodoModel extends HiveObject {
     bool? isCompleted,
     DateTime? createdAt,
     DateTime? completedAt,
+    String? goalId,
   }) {
     return TodoModel(
       id: id ?? this.id,
@@ -64,6 +69,7 @@ class TodoModel extends HiveObject {
       isCompleted: isCompleted ?? this.isCompleted,
       createdAt: createdAt ?? this.createdAt,
       completedAt: completedAt ?? this.completedAt,
+      goalId: goalId ?? this.goalId,
     );
   }
 
@@ -78,6 +84,7 @@ class TodoModel extends HiveObject {
       'isCompleted': isCompleted,
       'createdAt': createdAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
+      'goalId': goalId,
     };
   }
 
@@ -94,6 +101,7 @@ class TodoModel extends HiveObject {
       completedAt: json['completedAt'] != null
           ? DateTime.parse(json['completedAt'])
           : null,
+      goalId: json['goalId'],
     );
   }
 }

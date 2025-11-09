@@ -70,18 +70,26 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppState()),
-        ChangeNotifierProvider(
-          create: (_) => PomodoroProvider(service: pomodoroService),
-        ),
         ChangeNotifierProvider(create: (_) => StatsProvider()),
-        ChangeNotifierProvider(
-          create: (_) => TodoProvider(repository: todoRepository),
-        ),
         ChangeNotifierProvider(
           create: (_) => GoalProvider(repository: goalRepository),
         ),
         ChangeNotifierProvider(
+          create: (_) => TodoProvider(repository: todoRepository),
+        ),
+        ChangeNotifierProvider(
           create: (_) => RoutineProvider(repository: routineRepository),
+        ),
+        ChangeNotifierProxyProvider2<
+          StatsProvider,
+          GoalProvider,
+          PomodoroProvider
+        >(
+          create: (_) => PomodoroProvider(service: pomodoroService),
+          update: (_, stats, goals, pomodoro) {
+            pomodoro!.attachDependencies(stats, goals);
+            return pomodoro;
+          },
         ),
         ChangeNotifierProvider(create: (_) => EventProvider()),
       ],

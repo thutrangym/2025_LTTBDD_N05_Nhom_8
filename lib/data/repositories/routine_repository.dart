@@ -19,7 +19,7 @@ class RoutineRepository {
     return await _localStorage.getRoutine(routineId);
   }
 
-  List<RoutineModel> getAllRoutines() {
+  Future<List<RoutineModel>> getAllRoutines() async {
     return _localStorage.getAllRoutines();
   }
 
@@ -27,7 +27,8 @@ class RoutineRepository {
     return _localStorage.getRoutinesByType(type);
   }
 
-  Stream<List<RoutineModel>> getRoutinesStream() {
-    return Stream.value(_localStorage.getAllRoutines());
+  Stream<List<RoutineModel>> getRoutinesStream() async* {
+    final routines = _localStorage.getAllRoutines();
+    yield routines;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import '../models/todo_model.dart';
+import 'goal_provider.dart';
 import '../data/repositories/todo_repository.dart';
 import '../core/utils/date_utils.dart' as app_date_utils;
 
@@ -8,10 +9,15 @@ class TodoProvider extends ChangeNotifier {
 
   List<TodoModel> _todos = [];
   bool _isLoading = false;
+  GoalProvider? _goalProvider;
 
   TodoProvider({required TodoRepository repository})
     : _repository = repository {
     loadTodos();
+  }
+
+  void attachGoalProvider(GoalProvider goals) {
+    _goalProvider = goals;
   }
 
   List<TodoModel> get todos => _todos;
@@ -76,6 +82,22 @@ class TodoProvider extends ChangeNotifier {
         completedAt: !todo.isCompleted ? DateTime.now() : null,
       );
       await updateTodo(updatedTodo);
+      // If this todo is linked to a goal, update the goal's daily task
+      try {
+        if (updatedTodo.goalId != null && _goalProvider != null) {
+          final dateStr = updatedTodo.scheduledTime.toIso8601String().substring(
+            0,
+            10,
+          );
+          await _goalProvider!.updateDailyTask(
+            updatedTodo.goalId!,
+            dateStr,
+            updatedTodo.isCompleted,
+          );
+        }
+      } catch (e) {
+        debugPrint('[TodoProvider] failed to update linked goal: $e');
+      }
     } catch (e) {
       debugPrint('[TodoProvider] toggleTodoComplete() error: $e');
       throw Exception('Failed to toggle todo: $e');
