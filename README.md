@@ -44,7 +44,7 @@ Toàn bộ dữ liệu được lưu **cục bộ** bằng Hive, đảm bảo kh
 ### 2 Clone dự án
 ```bash
 git clone https://github.com/thutrangym/2025_LTTBDD_N05_Nhom_8.git
-cd personal_productivity_app
+cd 2025_LTTBDD_N05_Nhom_8
 ```
 
 ### 3 Cài đặt thư viện
